@@ -1,10 +1,15 @@
+[dev]
+  command = "yarn dev"
+  targetPort = 3333
+  framework = "#custom"
+
 [build.environment]
   NPM_FLAGS = "--prefix=/dev/null"
   NODE_VERSION = "14"
 
 [build]
   publish = "dist"
-  command = "npx pnpm i --store=node_modules/.pnpm-store && npx pnpm run build"
+  command = "yarn && yarn build"
 
 [[redirects]]
   from = "/*"
