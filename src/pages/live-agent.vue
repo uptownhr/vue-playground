@@ -50,7 +50,6 @@ function _injectLiveAgentScript() {
       // liveagent.showWhenOnline('5736e000000sXtg', document.getElementById('liveagent_button_online_5736e000000sXtg'));
       // liveagent.showWhenOffline('5736e000000sXtg', document.getElementById('liveagent_button_offline_5736e000000sXtg'));
     });
-
     liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', '5726e000000sXtR', '00D3i000000sBeJ');
   })
 }
