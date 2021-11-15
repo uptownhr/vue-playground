@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 
+const isOnline = ref(false)
+
+const deploymentId = '5725e000000HzhD'
+const buttonId = '5735e000000I0Tb'
+
+const chatOpen = ref(false)
 
 function injectScript (src, cb) {
   const s = document.createElement('script');
@@ -17,53 +23,45 @@ function injectScript (src, cb) {
   console.log('injected', src);
 }
 
-function initESW (gslbBaseURL) {
-  embedded_svc.settings.displayHelpButton = true; //Or false
-  embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
-  embedded_svc.settings.avatarImgURL = "https://bambee--c.documentforce.com/profilephoto/7293i000000kOeC/T";
-
-
-  embedded_svc.settings.enabledFeatures = ['LiveAgent'];
-  embedded_svc.settings.entryFeature = 'LiveAgent';
-
-  embedded_svc.init(
-      'https://bambee.my.salesforce.com',
-      'https://codepen.secure.force.com/liveAgentSetupFlow',
-      gslbBaseURL,
-      '00D3i000000sBeJ', // we don't know what this is
-      'Customer_Support_Chat',
-      {
-        baseLiveAgentContentURL: 'https://c.la4-c2-ia5.salesforceliveagent.com/content',
-        deploymentId: '5726e000000sXtR', // Chat Deployment Version
-        buttonId: '5736e000000sXtg', // Chat Queue
-        baseLiveAgentURL: 'https://d.la4-c2-ia5.salesforceliveagent.com/chat',
-        eswLiveAgentDevName: 'Customer_Support_Chat',
-        isOfflineSupportEnabled: false
-      }
-  );
-}
-
 function _injectLiveAgentScript() {
-  injectScript('https://c.la4-c2-ia5.salesforceliveagent.com/content/g/js/53.0/deployment.js', () => {
+  if (window.liveagent) return;
+
+  injectScript('https://c.la4-c1-ia4.salesforceliveagent.com/content/g/js/53.0/deployment.js', () => {
+
+    console.log('injected', 1)
     if (!window._laq) { window._laq = []; }
     window._laq.push(function(){
-      // liveagent.showWhenOnline('5736e000000sXtg', document.getElementById('liveagent_button_online_5736e000000sXtg'));
-      // liveagent.showWhenOffline('5736e000000sXtg', document.getElementById('liveagent_button_offline_5736e000000sXtg'));
+      liveagent.showWhenOnline(buttonId, document.getElementById('liveagent_button_online_5735e000000I0Tb'));
+      liveagent.showWhenOffline(buttonId, document.getElementById('liveagent_button_offline_5735e000000I0Tb'));
+      /*liveagent.showWhenOnline(deploymentId);
+      liveagent.showWhenOffline(deploymentId);*/
+      console.log('pushed queue cb')
     });
 
+    liveagent.addButtonEventHandler(buttonId, (e) => {
+      if(e == liveagent.BUTTON_EVENT.BUTTON_AVAILABLE){
+        isOnline.value = true
+      }else if(e == liveagent.BUTTON_EVENT.BUTTON_UNAVAILABLE){
+        isOnline.value = false
+      }
+
+      console.log('e', e)
+    });
+    console.log('injected', 2)
     /*
     2nd: id of deployment ID
-    3rd: id of baseUrl
+    3rd: id of baseUrl?
      */
-    liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', '5726e000000sXtR', '00D3i000000sBeJ');
+    liveagent.init(
+        'https://c.la4-c1-ia4.salesforceliveagent.com/chat',
+        deploymentId, //this was a shared ID between both billing and tech support
+        '00D5e000002EpPD' // what is this?
+    );
+    console.log('injected', 3, deploymentId)
   })
 }
 
-function injectEmbedded() {
-  injectScript('https://service.force.com/embeddedservice/5.0/esw.min.js', () => initESW('https://service.force.com'))
-}
-
-function openSFChat(subject) {
+/*function openSFChat(subject) {
   //overwrite prechat rules
   embedded_svc.settings.extraPrechatFormDetails = [{
     "label": "First Name",
@@ -184,12 +182,23 @@ function openSFChat(subject) {
   embedded_svc.bootstrapEmbeddedService( () => {
     loading = false
   });
-};
+};*/
+
+function openChat(buttonId){
+  chatOpen.value = true
+  nextTick(() => {
+    liveagent.setChatWindowHeight(400)
+    liveagent.setChatWindowWidth(400)
+    const test = liveagent.startChatWithWindow(buttonId, 'mywindowid');
+    console.log('test', test)
+  })
+
+
+}
 
 onMounted(() => {
   console.log('mounted')
   _injectLiveAgentScript()
-  injectEmbedded()
 })
 
 const chatText = ref('')
@@ -197,21 +206,29 @@ const chatText = ref('')
 </script>
 
 <template>
+  <div id="liveagent_button_online_5735e000000I0Tb">Available through element id</div>
+  <div id="liveagent_button_offline_5735e000000I0Tb">Not available through element id</div>
   <h1>Lets chat</h1>
-  <h2>Agent Status</h2>
-  <div id="liveagent_button_online_5736e000000sXtg" style="">
+  <h2>Agent Status - {{isOnline}}</h2>
+  <div :class="{ hide: !isOnline }">
     Agent is available
     <br>
     <label for="inquiry">Describe your inquiry</label><br>
     <textarea v-model="chatText" id="inquiry" maxlength="255" required></textarea>
     <br>
-    <button title="Open SF Chat" id="open-chat" @click="openSFChat(chatText);">Open SF Chat</button>
+    <button title="Open SF Chat" id="open-chat" @click="openChat(buttonId);">Open SF Chat</button>
     <hr>
   </div>
-  <div id="liveagent_button_offline_5736e000000sXtg" style="display: none;">Chat is currently unavailable</div>
+  <div :class="{ hide: isOnline}">Chat is currently unavailable</div>
+
+  <iframe v-if="chatOpen" name="mywindowid" />
 </template>
 
 <style>
+.hide {
+  display: none;
+}
+
 .embeddedServiceHelpButton, .prechatUI {opacity: 0; display:none !important}
 .embeddedServiceHelpButton .helpButton .uiButton {
   background-color: #120764;
@@ -219,5 +236,11 @@ const chatText = ref('')
 }
 .embeddedServiceHelpButton .helpButton .uiButton:focus {
   outline: 1px solid #120764;
+}
+
+iframe {
+  height: 400px;
+  width: 400px;
+  background-color: white;
 }
 </style>
