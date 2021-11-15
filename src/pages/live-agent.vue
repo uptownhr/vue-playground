@@ -30,12 +30,12 @@ function initESW (gslbBaseURL) {
       'https://bambee.my.salesforce.com',
       'https://codepen.secure.force.com/liveAgentSetupFlow',
       gslbBaseURL,
-      '00D3i000000sBeJ',
+      '00D3i000000sBeJ', // we don't know what this is
       'Customer_Support_Chat',
       {
         baseLiveAgentContentURL: 'https://c.la4-c2-ia5.salesforceliveagent.com/content',
-        deploymentId: '5726e000000sXtR',
-        buttonId: '5736e000000sXtg',
+        deploymentId: '5726e000000sXtR', // Chat Deployment Version
+        buttonId: '5736e000000sXtg', // Chat Queue
         baseLiveAgentURL: 'https://d.la4-c2-ia5.salesforceliveagent.com/chat',
         eswLiveAgentDevName: 'Customer_Support_Chat',
         isOfflineSupportEnabled: false
@@ -50,6 +50,11 @@ function _injectLiveAgentScript() {
       // liveagent.showWhenOnline('5736e000000sXtg', document.getElementById('liveagent_button_online_5736e000000sXtg'));
       // liveagent.showWhenOffline('5736e000000sXtg', document.getElementById('liveagent_button_offline_5736e000000sXtg'));
     });
+
+    /*
+    2nd: id of deployment ID
+    3rd: id of baseUrl
+     */
     liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', '5726e000000sXtR', '00D3i000000sBeJ');
   })
 }
@@ -141,38 +146,44 @@ function openSFChat(subject) {
       "doFind": false,
       "label": "First Name"
     }]
-  }, {
-    "entityName": "Case",
-    "showOnCreate": true,
-    "saveToTranscript": "Case",
-    "entityFieldMaps": [{
-      "isExactMatch": false,
-      "fieldName": "Subject",
-      "doCreate": true,
-      "doFind": false,
-      "label": "Subject"
-    }, {
-      "isExactMatch": false,
-      "fieldName": "Description",
-      "doCreate": true,
-      "doFind": false,
-      "label": "Description"
-    }, {
-      "isExactMatch": false,
-      "fieldName": "Status",
-      "doCreate": true,
-      "doFind": false,
-      "label": "Status"
-    }, {
-      "isExactMatch": false,
-      "fieldName": "Origin",
-      "doCreate": true,
-      "doFind": false,
-      "label": "Origin"
-    }]
-  }];
-  //console.log("values populated");
-  embedded_svc.bootstrapEmbeddedService();
+  },
+    { // this is to add new chat to an existing Case
+      "entityName": "Case",
+      "showOnCreate": true,
+      "saveToTranscript": "Case",
+      "entityFieldMaps": [{
+        "isExactMatch": false,
+        "fieldName": "Subject",
+        "doCreate": true,
+        "doFind": false,
+        "label": "Subject"
+      }, {
+        "isExactMatch": false,
+        "fieldName": "Description",
+        "doCreate": true,
+        "doFind": false,
+        "label": "Description"
+      }, {
+        "isExactMatch": false,
+        "fieldName": "Status",
+        "doCreate": true,
+        "doFind": false,
+        "label": "Status"
+      }, {
+        "isExactMatch": false,
+        "fieldName": "Origin",
+        "doCreate": true,
+        "doFind": false,
+        "label": "Origin"
+      }]
+    }];
+  // console.log("values populated");
+
+  let loading = true
+
+  embedded_svc.bootstrapEmbeddedService( () => {
+    loading = false
+  });
 };
 
 onMounted(() => {
@@ -186,7 +197,7 @@ const chatText = ref('')
 </script>
 
 <template>
-  <h1>Lets chatx</h1>
+  <h1>Lets chat</h1>
   <h2>Agent Status</h2>
   <div id="liveagent_button_online_5736e000000sXtg" style="">
     Agent is available
