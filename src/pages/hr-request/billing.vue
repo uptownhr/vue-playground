@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import {initESW, injectScript, openSFChat} from '~/libs/live-agent'
+import { injectScript, openSFChat, initESW } from "~/libs/live-agent";
 
+const buttonId = '5735e000000I0Tb'
 
+const chatText = ref("")
 
 injectScript('https://c.la4-c2-ia5.salesforceliveagent.com/content/g/js/53.0/deployment.js', () => {
   if (!window._laq) { window._laq = []; }
@@ -15,36 +17,29 @@ injectScript('https://c.la4-c2-ia5.salesforceliveagent.com/content/g/js/53.0/dep
   2nd: id of deployment ID
   3rd: id of baseUrl
    */
-  liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', '5726e000000sXtR', '00D3i000000sBeJ');
+  liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', buttonId, '00D3i000000sBeJ');
 })
 
 injectScript('https://service.force.com/embeddedservice/5.0/esw.min.js', () => initESW({
+  buttonId,
   baseSalesforceUrl: 'https://mindful-wolf-4reh1u-dev-ed.my.salesforce.com',
   liveAgentSetupUrl: 'https://chattestbambee-developer-edition.na162.force.com/liveAgentSetupFlow',
   orgId: '00D5e000002EpPD',
-  name: 'testChat2',
+  name: 'Billing',
   liveAgentBaseUrl: 'https://c.la4-c1-ia4.salesforceliveagent.com',
   deploymentId: '5725e000000HzhD',
-  buttonId: '5735e000000I0Tb'
 }))
-
-const chatText = ref('')
-
 </script>
 
 <template>
-  <h1>Lets chat</h1>
-  <h2>Agent Status</h2>
-  <div id="liveagent_button_online_5736e000000sXtg" style="">
-    Agent is available
-    <br>
-    <label for="inquiry">Describe your inquiry</label><br>
-    <textarea v-model="chatText" id="inquiry" maxlength="255" required></textarea>
-    <br>
-    <button title="Open SF Chat" id="open-chat" @click="openSFChat(chatText);">Open SF Chat</button>
-    <hr>
+  <h1 class="text-lg">Billing</h1>
+  <div>
+    <form @submit.prevent="openSFChat(chatText)">
+      <textarea v-model="chatText" class="border-black border-4 p-4" placeholder="What Billing Issue are you having?"/>
+      <br />
+      <button class="border-black border-1">Submit</button>
+    </form>
   </div>
-  <div id="liveagent_button_offline_5736e000000sXtg" style="display: none;">Chat is currently unavailable</div>
 </template>
 
 <style>
