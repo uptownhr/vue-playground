@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { injectScript, openSFChat, initESW } from "~/libs/live-agent";
 
 const buttonId = '5735e000000I0Ta';
+const deploymentId = '5725e000000HzhD';
 
 const chatText = ref("")
 
@@ -17,17 +18,17 @@ injectScript('https://c.la4-c2-ia5.salesforceliveagent.com/content/g/js/53.0/dep
   2nd: id of deployment ID
   3rd: id of baseUrl
    */
-  liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', buttonId, '00D3i000000sBeJ');
+  liveagent.init('https://d.la4-c2-ia5.salesforceliveagent.com/chat', deploymentId, '00D3i000000sBeJ');
 })
 
 injectScript('https://service.force.com/embeddedservice/5.0/esw.min.js', () => initESW({
   buttonId,
+  deploymentId,
   baseSalesforceUrl: 'https://mindful-wolf-4reh1u-dev-ed.my.salesforce.com',
   liveAgentSetupUrl: 'https://chattestbambee-developer-edition.na162.force.com/liveAgentSetupFlow',
   orgId: '00D5e000002EpPD',
-  name: 'Tech Support',
+  name: 'chat',
   liveAgentBaseUrl: 'https://c.la4-c1-ia4.salesforceliveagent.com',
-  deploymentId: '5725e000000HzhD'
 }))
 </script>
 

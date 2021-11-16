@@ -51,11 +51,11 @@ export function initESW (config: initESWConfig) {
     config.liveAgentSetupUrl,
     'https://service.force.com',
     config.orgId,
-    'testChat2',
+    config.name,
     {
       baseLiveAgentContentURL: `${config.liveAgentBaseUrl}/content`,
-      deploymentId: '5725e000000HzhD',
-      buttonId: '5735e000000I0Tb',
+      deploymentId: config.deploymentId,
+      buttonId: config.buttonId,
       baseLiveAgentURL: `${config.liveAgentBaseUrl}/chat`,
       eswLiveAgentDevName: 'testChat2',
       isOfflineSupportEnabled: false
