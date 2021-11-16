@@ -25,6 +25,9 @@ interface initESWConfig {
 }
 
 export function initESW (config: initESWConfig) {
+  delete window.liveAgent;
+  delete window.liveAgentDeployment;
+
   embedded_svc.settings.displayHelpButton = true; //Or false
   embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
 
@@ -46,6 +49,15 @@ export function initESW (config: initESWConfig) {
   embedded_svc.settings.enabledFeatures = ['LiveAgent'];
   embedded_svc.settings.entryFeature = 'LiveAgent';
 
+  embedded_svc.settings.directToButtonRouting = function(prechatFormData) {
+    const buttonIdObj = prechatFormData.find(item => item.label === 'ButtonId')
+
+    if (!buttonIdObj) console.log('buttonid not found')
+
+
+    return buttonIdObj.value
+  }
+
   embedded_svc.init(
     config.baseSalesforceUrl,
     config.liveAgentSetupUrl,
@@ -57,14 +69,14 @@ export function initESW (config: initESWConfig) {
       deploymentId: config.deploymentId,
       buttonId: config.buttonId,
       baseLiveAgentURL: `${config.liveAgentBaseUrl}/chat`,
-      eswLiveAgentDevName: 'testChat2',
+      eswLiveAgentDevName: 'testChat2x',
       isOfflineSupportEnabled: false
     }
   );
 };
 
 
-export function openSFChat(subject) {
+export function openSFChat({buttonId, subject}) {
   //overwrite prechat rules
   /*embedded_svc.settings.extraPrechatFormDetails = [{
     "label": "First Name",
@@ -180,5 +192,26 @@ export function openSFChat(subject) {
     }];*/
   // console.log("values populated");
 
-  embedded_svc.bootstrapEmbeddedService();
+  //embedded_svc.bootstrapEmbeddedService();
+  embedded_svc.liveAgentAPI.startChat({
+    directToAgentRouting: {
+      buttonId,
+      fallback: true
+    },
+    extraPrechatInfo: [],
+    extraPrechatFormDetails: [
+      {
+        "label": "First Name",
+        "value": "Missing",
+        "transcriptFields": [],
+        "displayToAgent": true
+      },
+      {
+        "label": "ButtonId",
+        "value": buttonId,
+        "transcriptFields": [],
+        "displayToAgent": false
+      }
+    ]
+  })
 };

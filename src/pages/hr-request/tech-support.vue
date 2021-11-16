@@ -27,7 +27,7 @@ injectScript('https://service.force.com/embeddedservice/5.0/esw.min.js', () => i
   baseSalesforceUrl: 'https://mindful-wolf-4reh1u-dev-ed.my.salesforce.com',
   liveAgentSetupUrl: 'https://chattestbambee-developer-edition.na162.force.com/liveAgentSetupFlow',
   orgId: '00D5e000002EpPD',
-  name: 'chat',
+  name: 'tech_support',
   liveAgentBaseUrl: 'https://c.la4-c1-ia4.salesforceliveagent.com',
 }))
 </script>
@@ -35,7 +35,7 @@ injectScript('https://service.force.com/embeddedservice/5.0/esw.min.js', () => i
 <template>
   <h1 class="text-lg">Tech Support</h1>
   <div>
-    <form @submit.prevent="openSFChat(chatText)">
+    <form @submit.prevent="openSFChat({buttonId, subject: chatText})">
       <textarea v-model="chatText" class="border-black border-4 p-4" placeholder="What Billing Issue are you having?"/>
       <br />
       <button class="border-black border-1">Submit</button>
